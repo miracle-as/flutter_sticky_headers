@@ -122,11 +122,12 @@ class RenderStickyHeader extends RenderBox
     // place header over content relative to scroll offset
     final double maxOffset = height - headerHeight;
     final headerParentData = _headerBox.parentData as MultiChildLayoutParentData;
+
     var dy = min(-stuckOffset, maxOffset);
-    
-    if ((_overlapHeaders && contentParentData.offset.dy == 0.0) || contentParentData.offset.dy == headerHeight) {
+    if (stuckOffset < 0 && maxOffset < -stuckOffset) {
       dy = 0.0;
     }
+    
     headerParentData.offset = new Offset(0.0, max(0.0, dy));
 
     // report to widget how much the header is stuck.
