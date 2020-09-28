@@ -28,6 +28,7 @@ class RenderStickyHeader extends RenderBox
   RenderStickyHeaderCallback _callback;
   ScrollableState _scrollable;
   bool _overlapHeaders;
+  double _availableHeight;
 
   RenderStickyHeader({
     @required ScrollableState scrollable,
@@ -35,10 +36,12 @@ class RenderStickyHeader extends RenderBox
     bool overlapHeaders: false,
     RenderBox header,
     RenderBox content,
+    double availableHeight,
   })  : assert(scrollable != null),
         _scrollable = scrollable,
         _callback = callback,
-        _overlapHeaders = overlapHeaders {
+        _overlapHeaders = overlapHeaders,
+        _availableHeight = availableHeight {
     if (content != null) add(content);
     if (header != null) add(header);
   }
@@ -124,8 +127,10 @@ class RenderStickyHeader extends RenderBox
     final headerParentData = _headerBox.parentData as MultiChildLayoutParentData;
 
     var dy = min(-stuckOffset, maxOffset);
-    if (stuckOffset < 0 && maxOffset < -stuckOffset) {
-      dy = 0.0;
+    if (_availableHeight != null) {
+      if (_availableHeight < _determineScrollBoxHeight()) {
+        dy = 0.0;
+      }
     }
     
     headerParentData.offset = new Offset(0.0, max(0.0, dy));
@@ -144,6 +149,20 @@ class RenderStickyHeader extends RenderBox
         return localToGlobal(Offset.zero, ancestor: scrollBox).dy;
       } catch (e) {
         // ignore and fall-through and return 0.0
+      }
+    }
+    return 0.0;
+  }
+
+  double _determineScrollBoxHeight() {
+    final scrollBox = _scrollable.context.findRenderObject() as RenderBox;
+    if (scrollBox?.attached ?? false) {
+      try {
+        if (scrollBox.hasSize) {
+          return scrollBox.size.height;
+        }
+      } catch (e) {
+
       }
     }
     return 0.0;

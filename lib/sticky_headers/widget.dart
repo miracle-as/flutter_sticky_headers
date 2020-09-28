@@ -33,6 +33,7 @@ class StickyHeader extends MultiChildRenderObjectWidget {
     Key key,
     @required this.header,
     @required this.content,
+    this.availableHeight,
     this.overlapHeaders: false,
     this.callback,
   }) : super(
@@ -40,6 +41,8 @@ class StickyHeader extends MultiChildRenderObjectWidget {
           // Note: The order of the children must be preserved for the RenderObject.
           children: [content, header],
         );
+
+  final double availableHeight;
 
   /// Header to be shown at the top of the parent [Scrollable] content.
   final Widget header;
@@ -62,6 +65,7 @@ class StickyHeader extends MultiChildRenderObjectWidget {
       scrollable: scrollable,
       callback: this.callback,
       overlapHeaders: this.overlapHeaders,
+      availableHeight: this.availableHeight,
     );
   }
 
