@@ -121,28 +121,14 @@ class RenderStickyHeader extends RenderBox
     final contentParentData = _contentBox.parentData as MultiChildLayoutParentData;
     contentParentData.offset = new Offset(0.0, _overlapHeaders ? 0.0 : headerHeight);
 
-    // determine by how much the header should be stuck to the top
-    final double stuckOffset = determineStuckOffset();
+    Future.delayed(Duration(microseconds: 10), () {
+      // determine by how much the header should be stuck to the top
+      final double stuckOffset = determineStuckOffset();
 
-    // place header over content relative to scroll offset
-    final double maxOffset = height - headerHeight;
-    final headerParentData = _headerBox.parentData as MultiChildLayoutParentData;
-
-    var dy = min(-stuckOffset, maxOffset);
-    if (_availableHeight != null) {
-      Future.delayed(Duration(microseconds: 10), () {
-        if (_availableHeight < _determineScrollBoxHeight()) {
-          dy = 0.0;
-          headerParentData.offset = new Offset(0.0, max(0.0, dy));
-
-          // report to widget how much the header is stuck.
-          if (_callback != null) {
-            final stuckAmount = max(min(headerHeight, stuckOffset), -headerHeight) / headerHeight;
-            _callback(stuckAmount);
-          }
-        }
-      });
-    } else {
+      // place header over content relative to scroll offset
+      final double maxOffset = height - headerHeight;
+      final headerParentData = _headerBox.parentData as MultiChildLayoutParentData;
+      var dy = min(-stuckOffset, maxOffset);
       headerParentData.offset = new Offset(0.0, max(0.0, dy));
 
       // report to widget how much the header is stuck.
@@ -150,7 +136,7 @@ class RenderStickyHeader extends RenderBox
         final stuckAmount = max(min(headerHeight, stuckOffset), -headerHeight) / headerHeight;
         _callback(stuckAmount);
       }
-    }
+    });
   }
 
   double determineStuckOffset() {
