@@ -2,6 +2,8 @@
 // Use of this source code is governed by a the MIT license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -128,17 +130,26 @@ class RenderStickyHeader extends RenderBox
 
     var dy = min(-stuckOffset, maxOffset);
     if (_availableHeight != null) {
-      if (_availableHeight < _determineScrollBoxHeight()) {
-        dy = 0.0;
-      }
-    }
-    
-    headerParentData.offset = new Offset(0.0, max(0.0, dy));
+      Future.delayed(Duration(microseconds: 10), () {
+        if (_availableHeight < _determineScrollBoxHeight()) {
+          dy = 0.0;
+          headerParentData.offset = new Offset(0.0, max(0.0, dy));
 
-    // report to widget how much the header is stuck.
-    if (_callback != null) {
-      final stuckAmount = max(min(headerHeight, stuckOffset), -headerHeight) / headerHeight;
-      _callback(stuckAmount);
+          // report to widget how much the header is stuck.
+          if (_callback != null) {
+            final stuckAmount = max(min(headerHeight, stuckOffset), -headerHeight) / headerHeight;
+            _callback(stuckAmount);
+          }
+        }
+      });
+    } else {
+      headerParentData.offset = new Offset(0.0, max(0.0, dy));
+
+      // report to widget how much the header is stuck.
+      if (_callback != null) {
+        final stuckAmount = max(min(headerHeight, stuckOffset), -headerHeight) / headerHeight;
+        _callback(stuckAmount);
+      }
     }
   }
 
